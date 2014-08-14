@@ -1,102 +1,76 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ModestTree.Zenject;
 using UnityEngine;
-using Dariyal.MMO.Battle;
-using Dariyal.MMO.Core.Input;
+using System.Collections;
+using ModestTree.Zenject;
 using Dariyal.MMO.Battle.HexGrid;
 
 namespace Dariyal.MMO.Battle
 {
-    public enum Cameras
+    public class BattleSceneInstaller : MonoInstaller
     {
-        Main,
-    }
-
-	public class BattleSceneInstaller : MonoInstaller
-	{
         public Settings SceneSettings;
 
         public override void InstallBindings()
         {
-            // Install any other re-usable installers
             InstallIncludes();
-            // Install the main game
-            InstallBattleScene();
+            InstallScene();
             InstallSettings();
-            InitPriorities();
         }
 
-        void InstallIncludes()
+        private void InstallIncludes()
         {
-            // This installer is needed for all unity projects (Yes, Zenject can support non-unity projects)
+            //prerequisite for all unity zenject projects
             _container.Bind<IInstaller>().ToSingle<StandardUnityInstaller>();
         }
 
-        void InstallBattleScene()
+        private void InstallScene()
         {
-            // Root of our object graph
+            //installing scene dependent classes.
+
+            //prerequisite for all zenject projects
             _container.Bind<IDependencyRoot>().ToSingle<DependencyRootStandard>();
 
-            _container.Bind<Camera>().ToSingle(SceneSettings.Camera.camera).As(Cameras.Main);
+            //install the main camera
+            _container.Bind<Camera>().ToSingle(SceneSettings.MainCamera);
 
-            //bind the input controller
-            _container.Bind<IInputController>().ToSingle<KeyboardController>();
+            //bind the input to mouse n keyboard controller
+            //_container.Bind<IInputController>().ToSingle<KeyboardController>();
 
             //Bind the Camera Controller
-            _container.Bind<IInitializable>().ToSingle<IsometricCameraController>();
-            _container.Bind<ITickable>().ToSingle<IsometricCameraController>();
-            _container.Bind<IsometricCameraController>().ToSingle();
+            //_container.Bind<IInitializable>().ToSingle<IsometricCameraController>();
+            //_container.Bind<ITickable>().ToSingle<IsometricCameraController>();
+            //_container.Bind<IsometricCameraController>().ToSingle();
 
-            //Bind the hex factory
+            _container.BindFactory<Hex>();
+            _container.Bind<HexHooks>().ToTransientFromPrefab<HexHooks>(SceneSettings.HexGridGenerator.HexPrefab).WhenInjectedInto<Hex>();
+
+            _container.Bind<IHexGridGenerator>().ToSingle<RegularHeagonalGenerator>();
+            _container.Bind<RegularHeagonalGenerator>().ToSingle();
+
+            _container.Bind<IInitializable>().ToSingle<HexGridManager>();
             _container.Bind<ITickable>().ToSingle<HexGridManager>();
             _container.Bind<HexGridManager>().ToSingle();
-            _container.Bind<IFactory<IHex>>().To(new GameObjectFactory<IHex, Hex>(_container, SceneSettings.HexGrid.hexPrefab));
-
-            _container.Bind<IInitializable>().ToSingle<BattleSceneController>();
-            _container.Bind<ITickable>().ToSingle<BattleSceneController>();
-            _container.Bind<BattleSceneController>().ToSingle();
         }
 
-        void InstallSettings()
+        private void InstallSettings()
         {
-            _container.Bind<KeyboardController.Settings>().ToSingle(SceneSettings.Keyboard);
-            _container.Bind<IsometricCameraController.Settings>().ToSingle(SceneSettings.Camera);
-            _container.Bind<HexGridManager.Settings>().ToSingle(SceneSettings.HexGrid);
-        }
-
-        void InitPriorities()
-        {
-            _container.Bind<IInstaller>().ToSingle<InitializablePrioritiesInstaller>();
-            _container.Bind<List<Type>>().To(Initializables)
-                .WhenInjectedInto<InitializablePrioritiesInstaller>();
-
-            _container.Bind<IInstaller>().ToSingle<TickablePrioritiesInstaller>();
-            _container.Bind<List<Type>>().To(Tickables)
-                .WhenInjectedInto<TickablePrioritiesInstaller>();
+            //_container.Bind<KeyboardController.Settings>().ToSingle(SceneSettings.Keyboard);
+            //_container.Bind<IsometricCameraController.Settings>().ToSingle(SceneSettings.Camera);
+            _container.Bind<RegularHeagonalGenerator.Settings>().ToSingle(SceneSettings.HexGridGenerator);
         }
 
         [Serializable]
         public class Settings
         {
-            public IsometricCameraController.Settings Camera;
-            public KeyboardController.Settings Keyboard;
-            public HexGridManager.Settings HexGrid;
+            public Camera MainCamera;
+            public RegularHeagonalGenerator.Settings HexGridGenerator;
+            //public IsometricCameraController.Settings Camera;
+            //public KeyboardController.Settings Keyboard;
+            //[Serializable]
+            //public class HexGridSettings
+            //{
+            //    public RegularHeagonalGenerator.Settings Generator;
+            //}
         }
-
-        static List<Type> Initializables = new List<Type>()
-        {
-            typeof(IsometricCameraController),
-            typeof(BattleSceneController),
-        };
-
-        static List<Type> Tickables = new List<Type>()
-        {
-            typeof(IsometricCameraController),
-            typeof(BattleSceneController),
-            typeof(HexGridManager),
-        };
     }
 }

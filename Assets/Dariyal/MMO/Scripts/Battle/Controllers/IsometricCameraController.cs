@@ -18,7 +18,7 @@ namespace Dariyal.MMO.Battle
 
         public void Initialize()
         {
-            _settings.camera.orthographicSize = _settings.zoomMinSize;
+            _settings.camera.orthographicSize = _settings.zoomMaxSize;
         }
 
         public void Tick()
@@ -33,8 +33,12 @@ namespace Dariyal.MMO.Battle
             }
 
             //Debug.Log(_input.CameraTransalation * _settings.scrollSpeed);
-            _settings.target.transform.position += (_input.CameraTransalation * _settings.scrollSpeed);
+            
 
+            //if (_settings.scrollZone.Contains(_settings.target.transform.position))
+            //{
+            //    _settings.target.transform.position += (_input.CameraTransalation * _settings.scrollSpeed);
+            //}
         }
 
         [Serializable]
@@ -46,6 +50,25 @@ namespace Dariyal.MMO.Battle
             public int zoomMaxSize;
             public float zoomSpeed;
             public float scrollSpeed;
+            /*
+            public Polygon scrollZone;
+
+            [Serializable]
+            public class Polygon
+            {
+                public Vector2 topRight;
+                public Vector2 topLeft;
+                public Vector2 bottomRight;
+                public Vector2 bottomLeft;
+
+                public bool Contains(Vector3 point)
+                {
+                    bool result = false;
+
+                    return result;
+                }
+            }
+             * */
         }
     }
 }
