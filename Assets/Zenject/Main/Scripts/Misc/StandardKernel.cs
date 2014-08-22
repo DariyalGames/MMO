@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -37,7 +36,7 @@ namespace ModestTree.Zenject
 
                 if (!success)
                 {
-                    //Debug.LogWarning(
+                    //Log.Warn(
                         //String.Format("Tickable with type '{0}' does not have a tick priority assigned",
                         //tickable.GetType()));
                 }
@@ -55,7 +54,7 @@ namespace ModestTree.Zenject
 
             foreach (var objType in unboundTypes)
             {
-                Debug.LogWarning("Found unbound ITickable with type '" + objType.Name() + "'");
+                Log.Warn("Found unbound ITickable with type '" + objType.Name() + "'");
             }
         }
 
@@ -123,7 +122,10 @@ namespace ModestTree.Zenject
             {
                 Assert.That(taskInfo.Priority.HasValue);
 
-                taskInfo.Tickable.Tick();
+                using (ProfileBlock.Start("{0}.Tick()".With(taskInfo.Tickable.GetType().Name())))
+                {
+                    taskInfo.Tickable.Tick();
+                }
             }
 
             ClearRemovedTasks(_sortedTasks);
@@ -135,7 +137,10 @@ namespace ModestTree.Zenject
             {
                 Assert.That(!taskInfo.Priority.HasValue);
 
-                taskInfo.Tickable.Tick();
+                using (ProfileBlock.Start("{0}.Tick()".With(taskInfo.Tickable.GetType().Name())))
+                {
+                    taskInfo.Tickable.Tick();
+                }
             }
 
             ClearRemovedTasks(_unsortedTasks);
@@ -152,7 +157,7 @@ namespace ModestTree.Zenject
 
                 if (info.IsRemoved)
                 {
-                    //Debug.Log("Removed task '" + info.Tickable.GetType().ToString() + "'");
+                    //Log.Warn("Removed task '" + info.Tickable.GetType().ToString() + "'");
                     tasks.Remove(node);
                 }
 

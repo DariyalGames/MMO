@@ -6,7 +6,6 @@ using UnityEditor;
 using UnityEngine;
 using System.Linq;
 using Debug=UnityEngine.Debug;
-using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -27,14 +26,14 @@ namespace ModestTree.Zenject
 
             if (compRoots.HasMoreThan(1))
             {
-                Debug.LogError("Found multiple composition roots when only one was expected while validating current scene");
+                Log.Error("Found multiple composition roots when only one was expected while validating current scene");
                 return false;
             }
 
             if (compRoots.IsEmpty())
             {
                 // Return true to allow playing in this case
-                Debug.LogError("Could not find composition root while validating current scene");
+                Log.Error("Could not find composition root while validating current scene");
                 return true;
             }
 
@@ -42,7 +41,7 @@ namespace ModestTree.Zenject
 
             if (compRoot.Installers.IsEmpty())
             {
-                Debug.LogWarning("Could not find installers while validating current scene");
+                Log.Warn("Could not find installers while validating current scene");
                 // Return true to allow playing in this case
                 return true;
             }
@@ -52,16 +51,16 @@ namespace ModestTree.Zenject
             // Only show a few to avoid spamming the log too much
             foreach (var error in resolveErrors)
             {
-                Debug.LogException(error);
+                Log.Error(error);
             }
 
             if (resolveErrors.Any())
             {
-                Debug.LogError("Validation Completed With Errors");
+                Log.Error("Validation Completed With Errors");
                 return false;
             }
 
-            Debug.Log("Validation Completed Successfully");
+            Log.Info("Validation Completed Successfully");
             return true;
         }
 
@@ -103,7 +102,7 @@ namespace ModestTree.Zenject
                 if (monoBehaviour == null)
                 {
                     // Be nice to give more information here
-                    Debug.LogWarning("Found null MonoBehaviour in scene");
+                    Log.Warn("Found null MonoBehaviour in scene");
                     continue;
                 }
 
@@ -128,7 +127,7 @@ namespace ModestTree.Zenject
         {
             if (!EditorApplication.isPlaying)
             {
-                Debug.LogError("Zenject error: Must be in play mode to generate object graph.  Hit Play button and try again.");
+                Log.Error("Zenject error: Must be in play mode to generate object graph.  Hit Play button and try again.");
                 return;
             }
 
@@ -139,7 +138,7 @@ namespace ModestTree.Zenject
             }
             catch (ZenjectException e)
             {
-                Debug.LogError("Unable to find container in current scene. " + e.ToString());
+                Log.Error("Unable to find container in current scene. " + e.ToString());
                 return;
             }
 

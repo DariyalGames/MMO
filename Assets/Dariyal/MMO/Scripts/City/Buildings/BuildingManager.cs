@@ -6,13 +6,14 @@ using UnityEngine;
 
 using ModestTree;
 using ModestTree.Zenject;
+using Dariyal.Util.Messenger;
 
 namespace Dariyal.MMO.City.Buildings
 {
     public enum BuildingTypes
     {
-        Barracks,
-        GemMine,
+        Orb,
+        Forger,
     }
 
     [Serializable]
@@ -27,13 +28,14 @@ namespace Dariyal.MMO.City.Buildings
         Settings _settings;
         List<IBuilding> _buildings;
         BuildingFactory _factory;
+        CityController _cityController;
 
-
-        public BuildingManager(Settings settings, BuildingFactory factory)
+        public BuildingManager(Settings settings, BuildingFactory factory, CityController cityController)
         {
             _settings = settings;
             _buildings = new List<IBuilding>();
             _factory = factory;
+            _cityController = cityController;
         }
 
 
@@ -41,14 +43,16 @@ namespace Dariyal.MMO.City.Buildings
         {
             //Initialize buidlings
             //Add the barracks.
-            IBuilding barracks = _factory.Create(BuildingTypes.Barracks, _settings.Barracks.Placeholder.localPosition);
-            barracks.Parent = _settings.BuildingsParent;
-            _buildings.Add(barracks);
+            IBuilding orb = _factory.Create(BuildingTypes.Orb, _settings.Orb.Placeholder.localPosition);
+            orb.Parent = _settings.BuildingsParent;
+            _buildings.Add(orb);
 
             //Addthe Gem Mine.
-            IBuilding gemmine = _factory.Create(BuildingTypes.GemMine, _settings.GemMine.Placeholder.localPosition);
-            gemmine.Parent = _settings.BuildingsParent;
-            _buildings.Add(gemmine);
+            IBuilding forger = _factory.Create(BuildingTypes.Forger, _settings.Forger.Placeholder.localPosition);
+            forger.Parent = _settings.BuildingsParent;
+            _buildings.Add(forger);
+
+            Messenger.AddListener<Vector3>("input_click", OnClick);
         }
 
         public void Tick()
@@ -60,12 +64,21 @@ namespace Dariyal.MMO.City.Buildings
             }
         }
 
+        void OnClick(Vector3 clickLocation)
+        {
+            foreach (IBuilding building in _buildings)
+            {
+                if (building.IsClicked(_cityController.MainCamera, clickLocation))
+                    break;
+            }
+        }
+
         [Serializable]
         public class Settings
         {
             public Transform BuildingsParent;
-            public BuildingDetails Barracks;
-            public BuildingDetails GemMine;
+            public BuildingDetails Orb;
+            public BuildingDetails Forger;
         }
     }
 }

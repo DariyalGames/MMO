@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -33,7 +32,7 @@ namespace ModestTree.Zenject
 
                 if (!success)
                 {
-                    //Debug.LogWarning(
+                    //Log.Warn(
                         //String.Format("IInitializable with type '{0}' does not have a priority assigned", //initializable.GetType()));
                 }
 
@@ -49,7 +48,7 @@ namespace ModestTree.Zenject
 
             foreach (var objType in unboundTypes)
             {
-                Debug.LogWarning("Found unbound IInitializable with type '" + objType.Name() + "'");
+                Log.Warn("Found unbound IInitializable with type '" + objType.Name() + "'");
             }
         }
 
@@ -75,7 +74,7 @@ namespace ModestTree.Zenject
 
             if (Assert.IsEnabled)
             {
-                foreach (var initializable in _initializables.Select(x => x.Initializable).FindDuplicates())
+                foreach (var initializable in _initializables.Select(x => x.Initializable).GetDuplicates())
                 {
                     Assert.That(false, "Found duplicate IInitializable with type '{0}'".With(initializable.GetType()));
                 }
@@ -83,11 +82,14 @@ namespace ModestTree.Zenject
 
             foreach (var initializable in _initializables)
             {
-                //Debug.Log("Initializing initializable with type '" + initializable.GetType() + "'");
+                //Log.Info("Initializing initializable with type '" + initializable.GetType() + "'");
 
                 try
                 {
-                    initializable.Initializable.Initialize();
+                    using (ProfileBlock.Start("{0}.Initialize()".With(initializable.Initializable.GetType().Name())))
+                    {
+                        initializable.Initializable.Initialize();
+                    }
                 }
                 catch (Exception e)
                 {

@@ -7,6 +7,7 @@ using UnityEngine;
 using ModestTree;
 using ModestTree.Zenject;
 using Dariyal.MMO.City.Buildings;
+using Dariyal.MMO.Core.Input;
 
 namespace Dariyal.MMO.City
 {
@@ -41,24 +42,37 @@ namespace Dariyal.MMO.City
             _container.Bind<IDependencyRoot>().ToSingle<DependencyRootStandard>();
 
             //Bind the main camera.
-            _container.Bind<Camera>().ToSingle(SceneSettings.MainCamera).As(Cameras.Main);
+            //_container.Bind<Camera>().ToSingle(SceneSettings.MainCamera).As(Cameras.Main);
+
+            //Bind the CityController
+            _container.Bind<IInitializable>().ToSingle<CityController>();
+            _container.Bind<CityController>().ToSingle();
 
             //Bind the Building manager to IInitiazable, ITickable and as a singleton.
             _container.Bind<IInitializable>().ToSingle<BuildingManager>();
             _container.Bind<ITickable>().ToSingle<BuildingManager>();
             _container.Bind<BuildingManager>().ToSingle();
 
-            //Bind the factor as a singleton.
+            //Bind the factory as a singleton.
             _container.Bind<BuildingFactory>().ToSingle();
 
             //Bind the hooks to the respective clases.
-            _container.Bind<BarracksHooks>().ToTransientFromPrefab<BarracksHooks>(SceneSettings.Buildings.Barracks.Prefab).WhenInjectedInto<Barracks>();
-            _container.Bind<GemMineHooks>().ToTransientFromPrefab<GemMineHooks>(SceneSettings.Buildings.GemMine.Prefab).WhenInjectedInto<GemMine>();
+            _container.Bind<OrbHooks>().ToTransientFromPrefab<OrbHooks>(SceneSettings.Buildings.Orb.Prefab).WhenInjectedInto<Orb>();
+            _container.Bind<ForgerHooks>().ToTransientFromPrefab<ForgerHooks>(SceneSettings.Buildings.Forger.Prefab).WhenInjectedInto<Forger>();
+
+#if UNITY_WEB || UNITY_EDITOR || UNITY_STANDALONE
+            _container.Bind<ITickable>().ToSingle<KeyboardMouseInputController>();
+            _container.Bind<KeyboardMouseInputController>().ToSingle();
+#else
+            _container.Bind<ITickable>().ToSingle<TouchInputController>();
+            _container.Bind<TouchInputController>().ToSingle();
+#endif
         }
 
         private void InstallSettings()
         {
             //Bind all settings classes.
+            _container.Bind<CityController.Settings>().ToSingle(SceneSettings.City);
             _container.Bind<BuildingManager.Settings>().ToSingle(SceneSettings.Buildings);
         }
 
@@ -76,18 +90,24 @@ namespace Dariyal.MMO.City
         [Serializable]
         public class Settings
         {
-            public Camera MainCamera;
+            public CityController.Settings City;
             public BuildingManager.Settings Buildings;
         }
 
         static List<Type> Initializables = new List<Type>()
         {
-            
+            typeof(CityController),
+            typeof(BuildingManager),
         };
 
         static List<Type> Tickables = new List<Type>()
         {
-            
+            typeof(BuildingManager),
+#if UNITY_WEB || UNITY_EDITOR || UNITY_STANDALONE
+            typeof(KeyboardMouseInputController),
+#else
+            typeof(TouchInputController),
+#endif
         };
     }
 }

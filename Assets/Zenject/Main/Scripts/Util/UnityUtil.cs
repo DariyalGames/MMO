@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace ModestTree.Zenject
 {
@@ -9,9 +10,14 @@ namespace ModestTree.Zenject
         // expected
         // In those cases you can use this function which will also
         // work with non-unity objects
-        public static bool IsNull(System.Object aObj)
+        public static bool IsNull(System.Object obj)
         {
-            return aObj == null || aObj.Equals(null);
+            return obj == null || obj.Equals(null);
+        }
+
+        public static bool ControlKeyIsDown()
+        {
+            return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
         }
     }
 }

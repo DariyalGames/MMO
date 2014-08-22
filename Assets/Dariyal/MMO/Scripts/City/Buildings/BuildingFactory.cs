@@ -17,10 +17,10 @@ namespace Dariyal.MMO.City.Buildings
         {
             switch(type)
             {
-                case BuildingTypes.Barracks:
-                    return _instantiator.Instantiate<Barracks>(constructorArgs);
-                case BuildingTypes.GemMine:
-                    return _instantiator.Instantiate<GemMine>(constructorArgs);
+                case BuildingTypes.Orb:
+                    return _instantiator.Instantiate<Orb>(constructorArgs);
+                case BuildingTypes.Forger:
+                    return _instantiator.Instantiate<Forger>(constructorArgs);
             }
 
             Assert.That(false);

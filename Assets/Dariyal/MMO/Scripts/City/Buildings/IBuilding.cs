@@ -12,6 +12,8 @@ namespace Dariyal.MMO.City.Buildings
     public interface IBuilding
     {
         void Update();
+
+        bool IsClicked(Camera camera, Vector3 location);
         
         Vector3 Location { get; set; }
 

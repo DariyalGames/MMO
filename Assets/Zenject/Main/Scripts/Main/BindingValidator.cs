@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Fasterflect;
 
 namespace ModestTree.Zenject
 {
@@ -17,15 +16,9 @@ namespace ModestTree.Zenject
         public static IEnumerable<ZenjectResolveException> ValidateContract(
             DiContainer container, Type contractType, InjectContext context)
         {
-            return ValidateContract(container, contractType, context, false);
-        }
-
-        public static IEnumerable<ZenjectResolveException> ValidateContract(
-            DiContainer container, Type contractType, InjectContext context, bool isOptional)
-        {
             var matches = container.GetProviderMatches(contractType, context);
 
-            if (matches.IsLength(1))
+            if (matches.Count == 1)
             {
                 foreach (var error in matches.Single().ValidateBinding(contractType, context))
                 {
@@ -42,7 +35,7 @@ namespace ModestTree.Zenject
 
                     if (matches.IsEmpty())
                     {
-                        if (!isOptional)
+                        if (!context.Optional)
                         {
                             if (container.FallbackProvider != null)
                             {
@@ -75,7 +68,7 @@ namespace ModestTree.Zenject
                 }
                 else
                 {
-                    if (!isOptional)
+                    if (!context.Optional)
                     {
                         if (matches.IsEmpty())
                         {
@@ -131,7 +124,7 @@ namespace ModestTree.Zenject
                         dependInfo, DiContainer.LookupsInProgress.ToList(), null);
 
                     foreach (var error in ValidateContract(
-                        container, dependInfo.ContractType, context, dependInfo.Optional))
+                        container, dependInfo.ContractType, context))
                     {
                         yield return error;
                     }
