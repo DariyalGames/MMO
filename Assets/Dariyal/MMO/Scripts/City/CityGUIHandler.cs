@@ -8,8 +8,8 @@ namespace Dariyal.MMO.City
     public class CityGUIHandler : MonoBehaviour
     {
         public GUISkin guiSkin;
-        float native_width = 1280;
-        float native_height = 800;
+        //float native_width = 1280;
+        //float native_height = 800;
 
         private bool showOrbMenu = false;
         private Rect orbRect;
@@ -17,7 +17,7 @@ namespace Dariyal.MMO.City
         
         void Start()
         {
-            Messenger.AddListener<Vector3>("orb_clicked", OnOrbClick);
+            Messenger.AddListener<Vector3>("city:orb:clicked", OnOrbClick);
 
             orbRect = new Rect(0, 0, 400, 200);
         }
@@ -53,7 +53,7 @@ namespace Dariyal.MMO.City
             if (GUILayout.Button("Recruit", "ShortButton"))
             {
                 showOrbMenu = false;
-                Messenger.Broadcast<int>("unit_recruited", unitCount);
+                Messenger.Broadcast<int>("city:orb:recruited", unitCount);
                 unitCount = 0;
             }
             GUILayout.EndHorizontal();

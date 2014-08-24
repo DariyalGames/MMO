@@ -22,7 +22,7 @@ namespace Dariyal.MMO.Core.Input
 
                 if (touch.phase == TouchPhase.Ended && touch.tapCount == 1)
                 {
-                    Messenger.Broadcast<Vector3>("input_click", touch.position);
+                    Messenger.Broadcast<Vector3>("input:click", touch.position);
                 }
             }
 

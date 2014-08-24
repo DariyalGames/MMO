@@ -52,7 +52,7 @@ namespace Dariyal.MMO.City.Buildings
             forger.Parent = _settings.BuildingsParent;
             _buildings.Add(forger);
 
-            Messenger.AddListener<Vector3>("input_click", OnClick);
+            Messenger.AddListener<Vector3>("input:click", OnClick);
         }
 
         public void Tick()
