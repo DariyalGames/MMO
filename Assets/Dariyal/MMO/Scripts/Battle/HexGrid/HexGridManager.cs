@@ -1,34 +1,73 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using ModestTree.Zenject;
-
+using Dariyal.Util.Messenger;
+using Dariyal.Util.PathFind;
 
 namespace Dariyal.MMO.Battle.HexGrid
 {
     public class HexGridManager : IInitializable, ITickable
     {
         IHexGridGenerator _generator;
+        BattleController _battleController;
+
         Dictionary<Point, Hex> _hexGrid;
 
-        public HexGridManager(IHexGridGenerator generator)
+        Hex _selectedHex;
+        Hex _destinationHex;
+        Hex _originHex;
+
+        Path<Hex> _currentPath;
+
+        public HexGridManager(IHexGridGenerator generator, BattleController controller)
         {
             _generator = generator;
+            _battleController = controller;
         }
 
         public void Initialize()
         {
+            //generate the hexgrid.
             _hexGrid = _generator.GenerateGrid();
+
+            //add event listeners.
+            Messenger.AddListener<Vector3>("input_click", OnClick);
         }
 
         public void Tick()
         {
             //Update all hexes.
+            //foreach (Hex hex in _hexGrid.Values)
+            //{
+            //    hex.Update();
+            //}
+        }
+
+        //Event listeners
+        void OnClick(Vector3 clickLocation)
+        {
             foreach (Hex hex in _hexGrid.Values)
             {
-                hex.Update();
+                if (hex.IsClicked(_battleController.ActiveCamera, clickLocation))
+                {
+                    _selectedHex = hex;
+                    _destinationHex = hex;
+                    if (_originHex == null)
+                        _originHex = hex;
+                    else if (hex == _selectedHex)
+                    {
+                        _selectedHex = null;
+                        hex.Selected = false;
+                    }
+                    if (_destinationHex != _originHex)
+                        _currentPath = PathFinder.FindPath<Hex>(_originHex, _destinationHex, distance, estimate);
+
+                    break;
+                }
             }
         }
 
+        //Pathfinding related
         static double distance(Hex tile1, Hex tile2)
         {
             return 1;

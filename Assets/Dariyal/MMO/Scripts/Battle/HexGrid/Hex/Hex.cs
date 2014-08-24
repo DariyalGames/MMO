@@ -10,23 +10,43 @@ namespace Dariyal.MMO.Battle.HexGrid
 {
     public class Hex : GridObject, IDisposable, IHasNeighbours<Hex>
     {
-        public bool Passable;
-
+        //Member variables.
         private HexHooks _hooks;
-        private bool _hasDisposed;
+        private Settings _settings;
 
-        public Hex(HexHooks hooks)
+        private bool _hasDisposed;
+        private bool _isPassable;
+        private bool _isSelected;
+        private bool _isInPath;
+
+        public bool ISPassable
+        {
+            get { return _isPassable; }
+            set { _isPassable = value; }
+        }
+
+        public bool Selected
+        {
+            get { return _isSelected; }
+            set 
+            { 
+                _isSelected = value; 
+            }
+        }
+
+        public Hex(HexHooks hooks, Settings settings)
             : base(0, 0)
         {
-            Passable = true;
+            ISPassable = true;
             _hooks = hooks;
+            _settings = settings;
             _hasDisposed = false;
         }
 
         public IEnumerable<Hex> AllNeighbours { get; set; }
         public IEnumerable<Hex> Neighbours
         {
-            get { return AllNeighbours.Where(o => o.Passable); }
+            get { return AllNeighbours.Where(o => o.ISPassable); }
         }
 
         public Vector3 WorldPosition
@@ -57,6 +77,45 @@ namespace Dariyal.MMO.Battle.HexGrid
             }
         }
 
+		public bool IsClicked(Camera camera, Vector3 clickLocation)
+		{
+            bool result = _hooks.IsClicked(camera, clickLocation);
+            //if (result)
+            //{
+            //    if (!Selected)
+            //        Selected = true;
+            //    else
+            //        Selected = false;
+            //}
+
+            return result;
+		}
+
+        public void FindNeighbours(Dictionary<Point, Hex> Board, Vector2 BoardSize, bool EqualLineLengths)
+        {
+            List<Hex> neighbours = new List<Hex>();
+
+            foreach (Point point in NeighbourShift)
+            {
+                int neighbourX = X + point.X;
+                int neighbourY = Y + point.Y;
+                //x coordinate offset specific to straight axis coordinates
+                int xOffset = neighbourY / 2;
+
+                //If every second hexagon row has less hexagons than the first one, just skip the last one when we come to it
+                if (neighbourY % 2 != 0 && !EqualLineLengths &&
+                    neighbourX + xOffset == BoardSize.x - 1)
+                    continue;
+                //Check to determine if currently processed coordinate is still inside the board limits
+                if (neighbourX >= 0 - xOffset &&
+                    neighbourX < (int)BoardSize.x - xOffset &&
+                    neighbourY >= 0 && neighbourY < (int)BoardSize.y)
+                    neighbours.Add(Board[new Point(neighbourX, neighbourY)]);
+            }
+
+            AllNeighbours = neighbours;
+        }
+
         public void Update()
         {
             //TODO: Add update logic.
@@ -68,6 +127,15 @@ namespace Dariyal.MMO.Battle.HexGrid
             _hasDisposed = true;
             GameObject.Destroy(_hooks);
             _hooks = null;
+        }
+
+        [Serializable]
+        public class Settings
+        {
+            public Color selectedColor;
+            public Color movableColor;
+            public Color defaultColor;
+            public Color impassableColor;
         }
     }
 }

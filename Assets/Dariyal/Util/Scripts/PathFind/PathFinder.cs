@@ -11,7 +11,7 @@ namespace Dariyal.Util.PathFind
             Node start,
             Node destination,
             Func<Node, Node, double> distance,
-            Func<Node, double> estimate)
+            Func<Node, Node, double> estimate)
             where Node : IHasNeighbours<Node>
         {
             var closed = new HashSet<Node>();
@@ -33,7 +33,7 @@ namespace Dariyal.Util.PathFind
                 {
                     double d = distance(path.LastStep, n);
                     var newPath = path.AddStep(n, d);
-                    queue.Enqueue(newPath.TotalCost + estimate(n), newPath);
+                    queue.Enqueue(newPath.TotalCost + estimate(n, destination), newPath);
                 }
             }
 
