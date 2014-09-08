@@ -2,7 +2,7 @@
 using System.Collections;
 using ModestTree.Zenject;
 using System;
-using Dariyal.Util.Messenger;
+using Dariyal.MessagePassing;
 
 namespace Dariyal.MMO.Core.Input
 {

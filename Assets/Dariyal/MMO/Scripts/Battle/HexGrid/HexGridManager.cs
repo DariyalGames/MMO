@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using ModestTree.Zenject;
-using Dariyal.Util.Messenger;
-using Dariyal.Util.PathFind;
+
+using Dariyal.MessagePassing;
+using Dariyal.PathFind;
+using Dariyal.MMO.Battle;
 
 namespace Dariyal.MMO.Battle.HexGrid
 {
@@ -31,7 +33,7 @@ namespace Dariyal.MMO.Battle.HexGrid
             _hexGrid = _generator.GenerateGrid();
 
             //add event listeners.
-            Messenger.AddListener<Vector3>("input_click", OnClick);
+            Messenger.AddListener<Vector3>("input:click", OnClick);
         }
 
         public void Tick()
@@ -60,7 +62,13 @@ namespace Dariyal.MMO.Battle.HexGrid
                         hex.Selected = false;
                     }
                     if (_destinationHex != _originHex)
+                    {
                         _currentPath = PathFinder.FindPath<Hex>(_originHex, _destinationHex, distance, estimate);
+                    }
+                    else
+                    {
+                        _currentPath = null;
+                    }
 
                     break;
                 }

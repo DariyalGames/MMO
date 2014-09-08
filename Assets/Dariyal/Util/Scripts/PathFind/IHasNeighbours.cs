@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Dariyal.Util.PathFind
+namespace Dariyal.PathFind
 {
     public interface IHasNeighbours<N>
     {

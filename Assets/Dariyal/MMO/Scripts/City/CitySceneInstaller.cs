@@ -57,8 +57,11 @@ namespace Dariyal.MMO.City
             _container.Bind<BuildingFactory>().ToSingle();
 
             //Bind the hooks to the respective clases.
-            _container.Bind<OrbHooks>().ToTransientFromPrefab<OrbHooks>(SceneSettings.Buildings.Orb.Prefab).WhenInjectedInto<Orb>();
-            _container.Bind<ForgerHooks>().ToTransientFromPrefab<ForgerHooks>(SceneSettings.Buildings.Forger.Prefab).WhenInjectedInto<Forger>();
+            _container.Bind<BuildingHooks>().ToTransientFromPrefab<BuildingHooks>(SceneSettings.BuildingSettings.Orb.Prefab).WhenInjectedInto<Orb>();
+            _container.Bind<BuildingHooks>().ToTransientFromPrefab<BuildingHooks>(SceneSettings.BuildingSettings.Forger.Prefab).WhenInjectedInto<Forger>();
+            _container.Bind<BuildingHooks>().ToTransientFromPrefab<BuildingHooks>(SceneSettings.BuildingSettings.GemMine.Prefab).WhenInjectedInto<GemMine>();
+            _container.Bind<BuildingHooks>().ToTransientFromPrefab<BuildingHooks>(SceneSettings.BuildingSettings.CrystalMine.Prefab).WhenInjectedInto<CrystalMine>();
+            _container.Bind<BuildingHooks>().ToTransientFromPrefab<BuildingHooks>(SceneSettings.BuildingSettings.Merchant.Prefab).WhenInjectedInto<Merchant>();
 
 #if UNITY_WEB || UNITY_EDITOR || UNITY_STANDALONE
             _container.Bind<ITickable>().ToSingle<KeyboardMouseInputController>();
@@ -73,7 +76,7 @@ namespace Dariyal.MMO.City
         {
             //Bind all settings classes.
             _container.Bind<CityController.Settings>().ToSingle(SceneSettings.City);
-            _container.Bind<BuildingManager.Settings>().ToSingle(SceneSettings.Buildings);
+            _container.Bind<BuildingManager.Settings>().ToSingle(SceneSettings.BuildingSettings);
         }
 
         private void InitPriorities()
@@ -91,7 +94,7 @@ namespace Dariyal.MMO.City
         public class Settings
         {
             public CityController.Settings City;
-            public BuildingManager.Settings Buildings;
+            public BuildingManager.Settings BuildingSettings;
         }
 
         static List<Type> Initializables = new List<Type>()

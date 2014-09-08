@@ -1,19 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+
+using ModestTree;
 using ModestTree.Zenject;
-using Dariyal.Util.Messenger;
+
+using Dariyal.MessagePassing;
+using UnityEngine;
 
 namespace Dariyal.MMO.Battle
 {
-    public class BattleController : IInitializable, ITickable
+    public enum CameraTypes
     {
+        Action,
+        Strategic,
+    }
+
+    public enum BattleSceneStates
+    {
+        WaitingToStart,
+        Playing,
+        GameEnded,
+    }
+
+	public class BattleController : IInitializable, ITickable
+	{
+        private BattleSceneStates _state = BattleSceneStates.WaitingToStart;
+        private Settings _settings;
+        private Camera _activeCamera;
+        private Battleground _battleground;
+        //Properties
         public Camera ActiveCamera
-        { 
+        {
             get { return _activeCamera; }
-            private set 
+            private set
             {
                 if (_activeCamera != null)
                     _activeCamera.enabled = false;
@@ -22,46 +40,64 @@ namespace Dariyal.MMO.Battle
             }
         }
 
-        private Settings _settings;
-        private Camera _activeCamera;
- 
-        public BattleController(Settings settings)
+        public CameraTypes ActiveCameraType { get; private set; }
+
+        public BattleSceneStates State
         {
-            _settings = settings;
+            get { return _state; }
+            set
+            {
+                var previousstate = _state;
+                _state = value;
+                if (_state != previousstate)
+                {
+                    //Messenger.Broadcast<BattleSceneStates>("battle:state:changed", _state);
+                }
+            }
         }
 
+        //constructor
+        public BattleController(Settings settings/*, Battleground battleground*/)
+        {
+            _settings = settings;
+            //_battleground = battleground;
+        }
+
+        //zenject related
         public void Initialize()
         {
             _settings.StrategicCamera.enabled = false;
             ActiveCamera = _settings.MainCamera;
 
-			//Messenger.AddListener<Vector3>("input_click", OnClick);
+            Messenger.AddListener("battle:gui:swapcamera", SwapCamera);
         }
 
         public void Tick()
         {
-            
+            //throw new NotImplementedException();
         }
 
+        //Events
+        void SwapCamera()
+        {
+            if (_activeCamera == _settings.MainCamera)
+            {
+                ActiveCamera = _settings.StrategicCamera;
+                ActiveCameraType = CameraTypes.Strategic;
+            }
+            else
+            {
+                ActiveCamera = _settings.MainCamera;
+                ActiveCameraType = CameraTypes.Action;
+            }
+        }
+
+        //Settings class
         [Serializable]
         public class Settings
         {
             public Camera MainCamera;
             public Camera StrategicCamera;
-        }
-
-        //Events
-        void OnClick(Vector3 clickPosition)
-        {
-            SwapCamera();
-        }
-
-        void SwapCamera()
-        {
-            if (_activeCamera == _settings.MainCamera)
-                ActiveCamera = _settings.StrategicCamera;
-            else
-                ActiveCamera = _settings.MainCamera;
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using Dariyal.Util.PathFind;
+using Dariyal.PathFind;
 using ModestTree;
 
 namespace Dariyal.MMO.Battle.HexGrid

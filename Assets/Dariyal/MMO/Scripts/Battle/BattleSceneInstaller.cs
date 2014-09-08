@@ -1,11 +1,14 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections;
-using ModestTree.Zenject;
-using Dariyal.MMO.Battle.HexGrid;
 using System.Collections.Generic;
 
+using UnityEngine;
+
+using ModestTree.Zenject;
+
 using Dariyal.MMO.Core.Input;
+using Dariyal.MMO.Battle;
+using Dariyal.MMO.Battle.HexGrid;
+
 
 namespace Dariyal.MMO.Battle
 {
@@ -48,12 +51,12 @@ namespace Dariyal.MMO.Battle
             _container.Bind<ITickable>().ToSingle<BattleController>();
             _container.Bind<BattleController>().ToSingle();
 
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
+#if UNITY_IPHONE || UNITY_ANDROID
+            _container.Bind<ITickable>().ToSingle<TouchInputController>();
+            _container.Bind<TouchInputController>().ToSingle();       
+#else
             _container.Bind<ITickable>().ToSingle<KeyboardMouseInputController>();
             _container.Bind<KeyboardMouseInputController>().ToSingle();
-#else
-            _container.Bind<ITickable>().ToSingle<TouchInputController>();
-            _container.Bind<TouchInputController>().ToSingle();
 #endif
 
         }
@@ -64,6 +67,7 @@ namespace Dariyal.MMO.Battle
             //_container.Bind<IsometricCameraController.Settings>().ToSingle(SceneSettings.Camera);
             _container.Bind<RegularHeagonalGenerator.Settings>().ToSingle(SceneSettings.HexGridGenerator);
             _container.Bind<BattleController.Settings>().ToSingle(SceneSettings.Battle);
+            _container.Bind<Hex.Settings>().ToSingle(SceneSettings.Hex);
         }
 
         void InitPriorities()
@@ -83,6 +87,7 @@ namespace Dariyal.MMO.Battle
             //public Camera MainCamera;
             public RegularHeagonalGenerator.Settings HexGridGenerator;
             public BattleController.Settings Battle;
+            public Hex.Settings Hex;
         }
 
         static List<Type> Initializables = new List<Type>()
@@ -90,6 +95,7 @@ namespace Dariyal.MMO.Battle
             // Re-arrange this list to control init order
             typeof(HexGridManager),
             typeof(BattleController),
+            typeof(Army),
         };
 
         static List<Type> Tickables = new List<Type>()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Dariyal.Util.PathFind
+namespace Dariyal.PathFind
 {
     class PriorityQueue<P, V>
     {

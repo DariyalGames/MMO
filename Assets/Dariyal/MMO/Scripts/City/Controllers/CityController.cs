@@ -2,7 +2,9 @@
 using System;
 using System.Collections;
 using ModestTree.Zenject;
-using Dariyal.Util.Messenger;
+using Dariyal.MessagePassing;
+using ModestTree;
+using Dariyal.MMO.Core.Units;
 
 
 namespace Dariyal.MMO.City
@@ -20,12 +22,12 @@ namespace Dariyal.MMO.City
 
         public void Initialize()
         {
-            Messenger.AddListener<int>("unit_recruited", OnRecruitUnit);
+            Messenger.AddListener<Tuple<UnitNames, int>>("city:orb:recruited", OnRecruitUnit);
         }
 
-        void OnRecruitUnit(int noOfUnits)
+        void OnRecruitUnit(Tuple<UnitNames, int> recruitedUnits)
         {
-            Log.InfoFormat("Recruited {0} Stone Golems", noOfUnits); 
+            Log.InfoFormat("Recruited {0} {1}", recruitedUnits.Second, recruitedUnits.First.ToString()); 
         }
 
         [Serializable]

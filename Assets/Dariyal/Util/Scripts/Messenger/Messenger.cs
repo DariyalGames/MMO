@@ -29,7 +29,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Dariyal.Util.Messenger
+namespace Dariyal.MessagePassing
 {
     static internal class Messenger
     {

@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Dariyal.Util.Messenger;
+using Dariyal.MessagePassing;
 using System;
+using ModestTree;
+using Dariyal.MMO.Core.Units;
 
 namespace Dariyal.MMO.City
 {
@@ -53,7 +55,7 @@ namespace Dariyal.MMO.City
             if (GUILayout.Button("Recruit", "ShortButton"))
             {
                 showOrbMenu = false;
-                Messenger.Broadcast<int>("city:orb:recruited", unitCount);
+                Messenger.Broadcast<Tuple<UnitNames, int>>("city:orb:recruited", new Tuple<UnitNames, int>(UnitNames.StoneGolem, unitCount));
                 unitCount = 0;
             }
             GUILayout.EndHorizontal();

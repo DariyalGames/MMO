@@ -6,7 +6,7 @@ using UnityEngine;
 
 using ModestTree;
 using ModestTree.Zenject;
-using Dariyal.Util.Messenger;
+using Dariyal.MessagePassing;
 
 namespace Dariyal.MMO.City.Buildings
 {
@@ -14,6 +14,9 @@ namespace Dariyal.MMO.City.Buildings
     {
         Orb,
         Forger,
+        GemMine,
+        CrystalMine,
+        Merchant,
     }
 
     [Serializable]
@@ -26,14 +29,14 @@ namespace Dariyal.MMO.City.Buildings
     public class BuildingManager : IInitializable, ITickable
     {
         Settings _settings;
-        List<IBuilding> _buildings;
+        List<Building> _buildings;
         BuildingFactory _factory;
         CityController _cityController;
 
         public BuildingManager(Settings settings, BuildingFactory factory, CityController cityController)
         {
             _settings = settings;
-            _buildings = new List<IBuilding>();
+            _buildings = new List<Building>();
             _factory = factory;
             _cityController = cityController;
         }
@@ -43,14 +46,29 @@ namespace Dariyal.MMO.City.Buildings
         {
             //Initialize buidlings
             //Add the barracks.
-            IBuilding orb = _factory.Create(BuildingTypes.Orb, _settings.Orb.Placeholder.localPosition);
+            Building orb = _factory.Create(BuildingTypes.Orb, _settings.Orb.Placeholder.localPosition);
             orb.Parent = _settings.BuildingsParent;
             _buildings.Add(orb);
 
-            //Addthe Gem Mine.
-            IBuilding forger = _factory.Create(BuildingTypes.Forger, _settings.Forger.Placeholder.localPosition);
+            //Addthe Forger.
+            Building forger = _factory.Create(BuildingTypes.Forger, _settings.Forger.Placeholder.localPosition);
             forger.Parent = _settings.BuildingsParent;
             _buildings.Add(forger);
+
+            //Addthe Gem Mine.
+            Building gemmine = _factory.Create(BuildingTypes.GemMine, _settings.GemMine.Placeholder.localPosition);
+            gemmine.Parent = _settings.BuildingsParent;
+            _buildings.Add(gemmine);
+
+            //Addthe Crystal Mine.
+            Building crysmine = _factory.Create(BuildingTypes.CrystalMine, _settings.CrystalMine.Placeholder.localPosition);
+            crysmine.Parent = _settings.BuildingsParent;
+            _buildings.Add(crysmine);
+
+            //Addthe Merchant.
+            Building merchant = _factory.Create(BuildingTypes.Merchant, _settings.Merchant.Placeholder.localPosition);
+            merchant.Parent = _settings.BuildingsParent;
+            _buildings.Add(merchant);
 
             Messenger.AddListener<Vector3>("input:click", OnClick);
         }
@@ -58,7 +76,7 @@ namespace Dariyal.MMO.City.Buildings
         public void Tick()
         {
             //Update buildings etc;
-            foreach (IBuilding building in _buildings)
+            foreach (Building building in _buildings)
             {
                 building.Update();
             }
@@ -66,7 +84,7 @@ namespace Dariyal.MMO.City.Buildings
 
         void OnClick(Vector3 clickLocation)
         {
-            foreach (IBuilding building in _buildings)
+            foreach (Building building in _buildings)
             {
                 if (building.IsClicked(_cityController.MainCamera, clickLocation))
                     break;
@@ -79,6 +97,9 @@ namespace Dariyal.MMO.City.Buildings
             public Transform BuildingsParent;
             public BuildingDetails Orb;
             public BuildingDetails Forger;
+            public BuildingDetails GemMine;
+            public BuildingDetails CrystalMine;
+            public BuildingDetails Merchant;
         }
     }
 }

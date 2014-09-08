@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Dariyal.Util.PathFind
+namespace Dariyal.PathFind
 {
     public class Path<Node> : IEnumerable<Node>
     {

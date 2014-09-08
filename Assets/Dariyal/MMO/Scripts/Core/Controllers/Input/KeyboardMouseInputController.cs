@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using ModestTree.Zenject;
 using UnityEngine;
-using Dariyal.Util.Messenger;
+using Dariyal.MessagePassing;
 
 namespace Dariyal.MMO.Core.Input
 {
@@ -12,9 +12,10 @@ namespace Dariyal.MMO.Core.Input
 	{
         public void Tick()
         {
-            if (UnityEngine.Input.GetMouseButtonDown(0))
+            if (UnityEngine.Input.GetKeyDown(KeyCode.Mouse0))
             {
-                Messenger.Broadcast<Vector3>("input_click", UnityEngine.Input.mousePosition);
+                Log.Info("Mouse Clicked at " + UnityEngine.Input.mousePosition);
+                Messenger.Broadcast<Vector3>("input:click", UnityEngine.Input.mousePosition);
             }
         }
     }
